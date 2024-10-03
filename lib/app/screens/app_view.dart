@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_todo_drift/app/parts/main/screens/main_view.dart';
 
 class AppView extends StatelessWidget {
   const AppView({super.key});
@@ -11,6 +12,7 @@ class AppView extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
+      home: const MainView(),
     );
   }
 }
