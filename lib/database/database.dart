@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:drift_flutter/drift_flutter.dart';
 
 part 'database.g.dart';
 
@@ -17,8 +18,12 @@ class CategoryItem extends Table {
 
 @DriftDatabase(tables: [TodoItem,CategoryItem])
 class AppDataBase extends _$AppDataBase{
-  AppDataBase(super.e);
+  AppDataBase() : super(_openConnection());
 
   @override
   int get schemaVersion => 1;
+
+  static QueryExecutor _openConnection() {
+    return driftDatabase(name: 'todos');
+  }
 }
