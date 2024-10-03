@@ -7,4 +7,9 @@ class DataBaseHelper {
   static Future<void> init() async {
       appDatabase = AppDataBase();
   }
+
+  static Future<List<TodoItemData>>getAllTasks() async {
+    final result = await appDatabase.select(appDatabase.todoItem).get();
+    return result;
+  }
 }
