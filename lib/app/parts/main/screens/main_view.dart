@@ -1,6 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_todo_drift/app/parts/main/cubit/main_cubit.dart';
+import 'package:flutter_todo_drift/app/parts/main/parts/tasks/screens/add_or_edit_task_screen.dart';
 
 class MainView extends StatelessWidget {
   const MainView({super.key});
@@ -10,7 +12,7 @@ class MainView extends StatelessWidget {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
-        onPressed: () {},),
+        onPressed: () => Navigator.push(context,CupertinoPageRoute(builder: (context) => const AddOrEditTaskScreen(),)),),
       body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(20),
