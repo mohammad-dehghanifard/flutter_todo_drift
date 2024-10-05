@@ -34,10 +34,37 @@ class MainView extends StatelessWidget {
                         itemCount: todos.length,
                         itemBuilder: (context, index) {
                           return  Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(todos[index].title),
-                              Text(todos[index].content),
+                              Row(
+                                children: [
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(todos[index].title),
+                                      Text(todos[index].content),
+
+                                    ],
+                                  ),
+                                  const Spacer(),
+                                // delete
+                                IconButton(
+                                  onPressed: () {
+                                    BlocProvider.of<MainCubit>(context).deleteTask(taskId: todos[index].id);
+                                    print(todos[index].id);
+                                  },
+                                  icon: const Icon(
+                                    CupertinoIcons.delete_solid,
+                                    color: CupertinoColors.destructiveRed,
+                                  )),
+                                // edit
+                                IconButton(
+                                  onPressed: () {},
+                                  icon: const Icon(
+                                    CupertinoIcons.pencil,
+                                    color: CupertinoColors.activeBlue,
+                                  )),
+                            ],
+                              ),
                               const Divider()
                             ],
                           );

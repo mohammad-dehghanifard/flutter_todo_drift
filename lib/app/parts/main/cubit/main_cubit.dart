@@ -19,4 +19,6 @@ class MainCubit extends Cubit<MainState> {
   }
 
   Stream<List<TodoItemData>> streamTask() => DataBaseHelper.getTaskStream();
+
+  void deleteTask({required int taskId}) => DataBaseHelper.deleteTask(id: taskId);
 }

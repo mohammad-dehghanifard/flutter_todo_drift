@@ -22,6 +22,13 @@ class DataBaseHelper {
 
   }
 
+  static void deleteTask({required int id}) async {
+
+    final query = appDatabase.delete(appDatabase.todoItem)..where((tbl) => tbl.id.equals(id));
+    await query.go();
+  }
+
+
 
   static Stream<List<TodoItemData>> getTaskStream() {
     return appDatabase.select(appDatabase.todoItem).watch();
