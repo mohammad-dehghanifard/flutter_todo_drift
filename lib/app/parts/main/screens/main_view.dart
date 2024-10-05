@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_todo_drift/app/parts/main/cubit/main_cubit.dart';
 import 'package:flutter_todo_drift/app/parts/main/parts/tasks/screens/add_or_edit_task_screen.dart';
+import 'package:flutter_todo_drift/database/database.dart';
 
 class MainView extends StatelessWidget {
   const MainView({super.key});
@@ -25,16 +26,22 @@ class MainView extends StatelessWidget {
                       child: Center(child: CircularProgressIndicator()));
                 }
                 else if(state is MainLoadTodoListSuccess) {
-                  return ListView.builder(
-                    itemCount: state.todos.length,
-                    itemBuilder: (context, index) {
-                      return  Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(state.todos[index].title),
-                          Text(state.todos[index].content),
-                          const Divider()
-                        ],
+                  return StreamBuilder<List<TodoItemData>>(
+                    stream: BlocProvider.of<MainCubit>(context).streamTask(),
+                    builder: (BuildContext context, AsyncSnapshot<List<TodoItemData>> snapshot) {
+                      final todos = snapshot.data ?? state.todos;
+                      return ListView.builder(
+                        itemCount: todos.length,
+                        itemBuilder: (context, index) {
+                          return  Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(todos[index].title),
+                              Text(todos[index].content),
+                              const Divider()
+                            ],
+                          );
+                        },
                       );
                     },
                   );

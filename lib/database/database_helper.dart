@@ -21,4 +21,9 @@ class DataBaseHelper {
     );
 
   }
+
+
+  static Stream<List<TodoItemData>> getTaskStream() {
+    return appDatabase.select(appDatabase.todoItem).watch();
+  }
 }

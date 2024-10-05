@@ -17,4 +17,6 @@ class MainCubit extends Cubit<MainState> {
       emit(MainLoadTodoListIsEmpty());
     }
   }
+
+  Stream<List<TodoItemData>> streamTask() => DataBaseHelper.getTaskStream();
 }
