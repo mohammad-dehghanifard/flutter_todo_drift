@@ -12,4 +12,12 @@ class DataBaseHelper {
     final result = await appDatabase.select(appDatabase.todoItem).get();
     return result;
   }
+
+  static Future<void> insertTodo({required String title,required String content}) async {
+    await appDatabase.into(appDatabase.todoItem).insert(TodoItemCompanion.insert(
+        title: title,
+        content: content,
+        categoryId: 0)
+    );
+  }
 }
