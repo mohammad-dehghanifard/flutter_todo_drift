@@ -46,11 +46,11 @@ class MainView extends StatelessWidget {
                                     ],
                                   ),
                                   const Spacer(),
+                                Checkbox(value: todos[index].isDone, onChanged: (value) {}),
                                 // delete
                                 IconButton(
                                   onPressed: () {
                                     BlocProvider.of<MainCubit>(context).deleteTask(taskId: todos[index].id);
-                                    print(todos[index].id);
                                   },
                                   icon: const Icon(
                                     CupertinoIcons.delete_solid,

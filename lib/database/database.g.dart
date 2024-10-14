@@ -229,8 +229,18 @@ class $TodoItemTable extends TodoItem
   late final GeneratedColumn<DateTime> date = GeneratedColumn<DateTime>(
       'date', aliasedName, true,
       type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _isDoneMeta = const VerificationMeta('isDone');
   @override
-  List<GeneratedColumn> get $columns => [id, title, content, categoryId, date];
+  late final GeneratedColumn<bool> isDone = GeneratedColumn<bool>(
+      'is_done', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_done" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, title, content, categoryId, date, isDone];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -268,6 +278,10 @@ class $TodoItemTable extends TodoItem
       context.handle(
           _dateMeta, date.isAcceptableOrUnknown(data['date']!, _dateMeta));
     }
+    if (data.containsKey('is_done')) {
+      context.handle(_isDoneMeta,
+          isDone.isAcceptableOrUnknown(data['is_done']!, _isDoneMeta));
+    }
     return context;
   }
 
@@ -287,6 +301,8 @@ class $TodoItemTable extends TodoItem
           .read(DriftSqlType.int, data['${effectivePrefix}category_id'])!,
       date: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}date']),
+      isDone: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_done'])!,
     );
   }
 
@@ -302,12 +318,14 @@ class TodoItemData extends DataClass implements Insertable<TodoItemData> {
   final String content;
   final int categoryId;
   final DateTime? date;
+  final bool isDone;
   const TodoItemData(
       {required this.id,
       required this.title,
       required this.content,
       required this.categoryId,
-      this.date});
+      this.date,
+      required this.isDone});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -318,6 +336,7 @@ class TodoItemData extends DataClass implements Insertable<TodoItemData> {
     if (!nullToAbsent || date != null) {
       map['date'] = Variable<DateTime>(date);
     }
+    map['is_done'] = Variable<bool>(isDone);
     return map;
   }
 
@@ -328,6 +347,7 @@ class TodoItemData extends DataClass implements Insertable<TodoItemData> {
       content: Value(content),
       categoryId: Value(categoryId),
       date: date == null && nullToAbsent ? const Value.absent() : Value(date),
+      isDone: Value(isDone),
     );
   }
 
@@ -340,6 +360,7 @@ class TodoItemData extends DataClass implements Insertable<TodoItemData> {
       content: serializer.fromJson<String>(json['content']),
       categoryId: serializer.fromJson<int>(json['categoryId']),
       date: serializer.fromJson<DateTime?>(json['date']),
+      isDone: serializer.fromJson<bool>(json['isDone']),
     );
   }
   @override
@@ -351,6 +372,7 @@ class TodoItemData extends DataClass implements Insertable<TodoItemData> {
       'content': serializer.toJson<String>(content),
       'categoryId': serializer.toJson<int>(categoryId),
       'date': serializer.toJson<DateTime?>(date),
+      'isDone': serializer.toJson<bool>(isDone),
     };
   }
 
@@ -359,13 +381,15 @@ class TodoItemData extends DataClass implements Insertable<TodoItemData> {
           String? title,
           String? content,
           int? categoryId,
-          Value<DateTime?> date = const Value.absent()}) =>
+          Value<DateTime?> date = const Value.absent(),
+          bool? isDone}) =>
       TodoItemData(
         id: id ?? this.id,
         title: title ?? this.title,
         content: content ?? this.content,
         categoryId: categoryId ?? this.categoryId,
         date: date.present ? date.value : this.date,
+        isDone: isDone ?? this.isDone,
       );
   TodoItemData copyWithCompanion(TodoItemCompanion data) {
     return TodoItemData(
@@ -375,6 +399,7 @@ class TodoItemData extends DataClass implements Insertable<TodoItemData> {
       categoryId:
           data.categoryId.present ? data.categoryId.value : this.categoryId,
       date: data.date.present ? data.date.value : this.date,
+      isDone: data.isDone.present ? data.isDone.value : this.isDone,
     );
   }
 
@@ -385,13 +410,14 @@ class TodoItemData extends DataClass implements Insertable<TodoItemData> {
           ..write('title: $title, ')
           ..write('content: $content, ')
           ..write('categoryId: $categoryId, ')
-          ..write('date: $date')
+          ..write('date: $date, ')
+          ..write('isDone: $isDone')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, title, content, categoryId, date);
+  int get hashCode => Object.hash(id, title, content, categoryId, date, isDone);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -400,7 +426,8 @@ class TodoItemData extends DataClass implements Insertable<TodoItemData> {
           other.title == this.title &&
           other.content == this.content &&
           other.categoryId == this.categoryId &&
-          other.date == this.date);
+          other.date == this.date &&
+          other.isDone == this.isDone);
 }
 
 class TodoItemCompanion extends UpdateCompanion<TodoItemData> {
@@ -409,12 +436,14 @@ class TodoItemCompanion extends UpdateCompanion<TodoItemData> {
   final Value<String> content;
   final Value<int> categoryId;
   final Value<DateTime?> date;
+  final Value<bool> isDone;
   const TodoItemCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
     this.content = const Value.absent(),
     this.categoryId = const Value.absent(),
     this.date = const Value.absent(),
+    this.isDone = const Value.absent(),
   });
   TodoItemCompanion.insert({
     this.id = const Value.absent(),
@@ -422,6 +451,7 @@ class TodoItemCompanion extends UpdateCompanion<TodoItemData> {
     required String content,
     required int categoryId,
     this.date = const Value.absent(),
+    this.isDone = const Value.absent(),
   })  : title = Value(title),
         content = Value(content),
         categoryId = Value(categoryId);
@@ -431,6 +461,7 @@ class TodoItemCompanion extends UpdateCompanion<TodoItemData> {
     Expression<String>? content,
     Expression<int>? categoryId,
     Expression<DateTime>? date,
+    Expression<bool>? isDone,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -438,6 +469,7 @@ class TodoItemCompanion extends UpdateCompanion<TodoItemData> {
       if (content != null) 'body': content,
       if (categoryId != null) 'category_id': categoryId,
       if (date != null) 'date': date,
+      if (isDone != null) 'is_done': isDone,
     });
   }
 
@@ -446,13 +478,15 @@ class TodoItemCompanion extends UpdateCompanion<TodoItemData> {
       Value<String>? title,
       Value<String>? content,
       Value<int>? categoryId,
-      Value<DateTime?>? date}) {
+      Value<DateTime?>? date,
+      Value<bool>? isDone}) {
     return TodoItemCompanion(
       id: id ?? this.id,
       title: title ?? this.title,
       content: content ?? this.content,
       categoryId: categoryId ?? this.categoryId,
       date: date ?? this.date,
+      isDone: isDone ?? this.isDone,
     );
   }
 
@@ -474,6 +508,9 @@ class TodoItemCompanion extends UpdateCompanion<TodoItemData> {
     if (date.present) {
       map['date'] = Variable<DateTime>(date.value);
     }
+    if (isDone.present) {
+      map['is_done'] = Variable<bool>(isDone.value);
+    }
     return map;
   }
 
@@ -484,7 +521,8 @@ class TodoItemCompanion extends UpdateCompanion<TodoItemData> {
           ..write('title: $title, ')
           ..write('content: $content, ')
           ..write('categoryId: $categoryId, ')
-          ..write('date: $date')
+          ..write('date: $date, ')
+          ..write('isDone: $isDone')
           ..write(')'))
         .toString();
   }
@@ -658,6 +696,7 @@ typedef $$TodoItemTableCreateCompanionBuilder = TodoItemCompanion Function({
   required String content,
   required int categoryId,
   Value<DateTime?> date,
+  Value<bool> isDone,
 });
 typedef $$TodoItemTableUpdateCompanionBuilder = TodoItemCompanion Function({
   Value<int> id,
@@ -665,6 +704,7 @@ typedef $$TodoItemTableUpdateCompanionBuilder = TodoItemCompanion Function({
   Value<String> content,
   Value<int> categoryId,
   Value<DateTime?> date,
+  Value<bool> isDone,
 });
 
 final class $$TodoItemTableReferences
@@ -709,6 +749,11 @@ class $$TodoItemTableFilterComposer
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
+  ColumnFilters<bool> get isDone => $state.composableBuilder(
+      column: $state.table.isDone,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
   $$CategoryItemTableFilterComposer get categoryId {
     final $$CategoryItemTableFilterComposer composer = $state.composerBuilder(
         composer: this,
@@ -742,6 +787,11 @@ class $$TodoItemTableOrderingComposer
 
   ColumnOrderings<DateTime> get date => $state.composableBuilder(
       column: $state.table.date,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<bool> get isDone => $state.composableBuilder(
+      column: $state.table.isDone,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 
@@ -783,6 +833,7 @@ class $$TodoItemTableTableManager extends RootTableManager<
             Value<String> content = const Value.absent(),
             Value<int> categoryId = const Value.absent(),
             Value<DateTime?> date = const Value.absent(),
+            Value<bool> isDone = const Value.absent(),
           }) =>
               TodoItemCompanion(
             id: id,
@@ -790,6 +841,7 @@ class $$TodoItemTableTableManager extends RootTableManager<
             content: content,
             categoryId: categoryId,
             date: date,
+            isDone: isDone,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
@@ -797,6 +849,7 @@ class $$TodoItemTableTableManager extends RootTableManager<
             required String content,
             required int categoryId,
             Value<DateTime?> date = const Value.absent(),
+            Value<bool> isDone = const Value.absent(),
           }) =>
               TodoItemCompanion.insert(
             id: id,
@@ -804,6 +857,7 @@ class $$TodoItemTableTableManager extends RootTableManager<
             content: content,
             categoryId: categoryId,
             date: date,
+            isDone: isDone,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) =>
