@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart';
 import 'package:flutter_todo_drift/database/database.dart';
 
 class DataBaseHelper {
@@ -27,10 +28,10 @@ class DataBaseHelper {
     final query = appDatabase.delete(appDatabase.todoItem)..where((tbl) => tbl.id.equals(id));
     await query.go();
   }
+  
+  static void changeTaskStatus({required int id,required bool newStatus}) async {
+    final query =  (appDatabase.update(appDatabase.todoItem)..where((tbl) => tbl.id.equals(id)));
+    final updateTask = await query.write(TodoItemCompanion(isDone: Value(newStatus)));
 
-
-
-  static Stream<List<TodoItemData>> getTaskStream() {
-    return appDatabase.select(appDatabase.todoItem).watch();
   }
 }

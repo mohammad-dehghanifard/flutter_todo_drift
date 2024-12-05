@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_todo_drift/app/parts/main/cubit/main_cubit.dart';
 import 'package:flutter_todo_drift/app/parts/main/parts/tasks/cubit/task_cubit.dart';
 
 class AddOrEditTaskScreen extends StatelessWidget {
@@ -22,6 +23,8 @@ class AddOrEditTaskScreen extends StatelessWidget {
           padding: const EdgeInsets.all(20.0),
           child: BlocConsumer<TaskCubit,TaskState>(
               builder: (context, state) {
+                final taskCubit =  BlocProvider.of<TaskCubit>(context);
+                final mainCubit =  context.watch<MainCubit>();
                 return Column(
                   children: [
                     // forms
@@ -103,9 +106,10 @@ class AddOrEditTaskScreen extends StatelessWidget {
                               backgroundColor: WidgetStatePropertyAll(
                                   CupertinoColors.systemPurple)
                           ),
-                          onPressed: () {
+                          onPressed: () async {
                             if (formKey.currentState!.validate()) {
-                              BlocProvider.of<TaskCubit>(context).addTask(title: taskTitle.text, content: taskContent.text);
+                              taskCubit.addTask(title: taskTitle.text, content: taskContent.text);
+                               mainCubit.getAllData();
                             }
                           },
                           child: const Text("Add Task",
@@ -117,6 +121,7 @@ class AddOrEditTaskScreen extends StatelessWidget {
               }, listener: (BuildContext context, TaskState state) {
                 if(state is TaskSuccessState) {
                   Navigator.pop(context);
+
                 }
           },
           )

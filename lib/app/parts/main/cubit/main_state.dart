@@ -12,6 +12,11 @@ final class MainLoadTodoListSuccess extends MainState {
   final List<TodoItemData> todos;
 }
 
+final class MainChangeTaskStatus extends MainState {
+  MainChangeTaskStatus({required this.taskStatus});
+  final bool taskStatus;
+}
+
 final class MainLoadTodoListIsEmpty extends MainState {}
 
 

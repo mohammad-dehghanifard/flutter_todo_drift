@@ -3,13 +3,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_todo_drift/app/parts/main/cubit/main_cubit.dart';
 import 'package:flutter_todo_drift/app/parts/main/parts/tasks/screens/add_or_edit_task_screen.dart';
-import 'package:flutter_todo_drift/database/database.dart';
 
-class MainView extends StatelessWidget {
+class MainView extends StatefulWidget {
   const MainView({super.key});
 
   @override
+  State<MainView> createState() => _MainViewState();
+}
+
+
+class _MainViewState extends State<MainView> {
+
+  @override
+  void initState() {
+    BlocProvider.of<MainCubit>(context).getAllData();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final mainCubit = context.watch<MainCubit>();
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
@@ -26,29 +39,32 @@ class MainView extends StatelessWidget {
                       child: Center(child: CircularProgressIndicator()));
                 }
                 else if(state is MainLoadTodoListSuccess) {
-                  return StreamBuilder<List<TodoItemData>>(
-                    stream: BlocProvider.of<MainCubit>(context).streamTask(),
-                    builder: (BuildContext context, AsyncSnapshot<List<TodoItemData>> snapshot) {
-                      final todos = snapshot.data ?? state.todos;
-                      return ListView.builder(
-                        itemCount: todos.length,
-                        itemBuilder: (context, index) {
-                          return  Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(todos[index].title),
-                                      Text(todos[index].content),
+                  final todos = state.todos;
+                  return  ListView.builder(
+                    itemCount: todos.length,
+                    itemBuilder: (context, index) {
 
-                                    ],
-                                  ),
-                                  const Spacer(),
-                                Checkbox(value: todos[index].isDone, onChanged: (value) {}),
-                                // delete
-                                IconButton(
+                      return  Column(
+                        children: [
+                          Row(
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(todos[index].title),
+                                  Text(todos[index].content),
+
+                                ],
+                              ),
+                              const Spacer(),
+                              Checkbox(
+                                  value: todos[index].isDone,
+                                  onChanged: (value) {
+                                    mainCubit.changeTaskStatus(taskId: todos[index].id, newStatus: value ?? false);
+                                  }
+                              ),
+                              // delete
+                              IconButton(
                                   onPressed: () {
                                     BlocProvider.of<MainCubit>(context).deleteTask(taskId: todos[index].id);
                                   },
@@ -56,19 +72,17 @@ class MainView extends StatelessWidget {
                                     CupertinoIcons.delete_solid,
                                     color: CupertinoColors.destructiveRed,
                                   )),
-                                // edit
-                                IconButton(
+                              // edit
+                              IconButton(
                                   onPressed: () {},
                                   icon: const Icon(
                                     CupertinoIcons.pencil,
                                     color: CupertinoColors.activeBlue,
                                   )),
                             ],
-                              ),
-                              const Divider()
-                            ],
-                          );
-                        },
+                          ),
+                          const Divider()
+                        ],
                       );
                     },
                   );

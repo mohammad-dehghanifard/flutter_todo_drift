@@ -8,7 +8,7 @@ part 'main_state.dart';
 class MainCubit extends Cubit<MainState> {
   MainCubit() : super(MainInitial());
 
-  void getAllData() async {
+  Future<void> getAllData() async {
     emit(MainLoading());
     final List<TodoItemData> todoList = await DataBaseHelper.getAllTasks();
     if(todoList.isNotEmpty) {
@@ -18,7 +18,11 @@ class MainCubit extends Cubit<MainState> {
     }
   }
 
-  Stream<List<TodoItemData>> streamTask() => DataBaseHelper.getTaskStream();
 
   void deleteTask({required int taskId}) => DataBaseHelper.deleteTask(id: taskId);
+
+  void changeTaskStatus({required int taskId,required bool newStatus}) {
+    DataBaseHelper.changeTaskStatus(id: taskId, newStatus: newStatus);
+    emit(MainChangeTaskStatus(taskStatus: newStatus));
+  }
 }
