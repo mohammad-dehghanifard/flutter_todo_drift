@@ -1,22 +1,18 @@
 part of 'main_cubit.dart';
 
-@immutable
-sealed class MainState {}
 
-final class MainInitial extends MainState {}
-
-final class MainLoading extends MainState {}
-
-final class MainLoadTodoListSuccess extends MainState {
-  MainLoadTodoListSuccess({required this.todos});
+class MainState {
+  MainState({required this.todos, required this.hasLoading});
   final List<TodoItemData> todos;
+  final bool hasLoading;
+
+
+  MainState copyWith({List<TodoItemData>? newTodosList, bool? newLoading}) {
+    return MainState(
+        todos: newTodosList ?? todos,
+        hasLoading : newLoading ?? hasLoading);
+  }
 }
 
-final class MainChangeTaskStatus extends MainState {
-  MainChangeTaskStatus({required this.taskStatus});
-  final bool taskStatus;
-}
-
-final class MainLoadTodoListIsEmpty extends MainState {}
 
 

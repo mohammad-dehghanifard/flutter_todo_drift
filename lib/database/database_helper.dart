@@ -15,7 +15,7 @@ class DataBaseHelper {
   }
 
   static Future<void> insertTodo({required String title,required String content}) async {
-    final result = await appDatabase.into(appDatabase.todoItem).insert(TodoItemCompanion.insert(
+    await appDatabase.into(appDatabase.todoItem).insert(TodoItemCompanion.insert(
         title: title,
         content: content,
         categoryId: 0)
@@ -23,15 +23,14 @@ class DataBaseHelper {
 
   }
 
-  static void deleteTask({required int id}) async {
-
+  static Future<void> deleteTask({required int id}) async {
     final query = appDatabase.delete(appDatabase.todoItem)..where((tbl) => tbl.id.equals(id));
     await query.go();
   }
   
-  static void changeTaskStatus({required int id,required bool newStatus}) async {
+  static Future<void> changeTaskStatus({required int id,required bool newStatus}) async {
     final query =  (appDatabase.update(appDatabase.todoItem)..where((tbl) => tbl.id.equals(id)));
-    final updateTask = await query.write(TodoItemCompanion(isDone: Value(newStatus)));
+    await query.write(TodoItemCompanion(isDone: Value(newStatus)));
 
   }
 }

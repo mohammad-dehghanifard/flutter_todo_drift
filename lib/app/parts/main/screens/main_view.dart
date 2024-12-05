@@ -32,65 +32,59 @@ class _MainViewState extends State<MainView> {
             padding: const EdgeInsets.all(20),
             child: BlocBuilder<MainCubit, MainState>(
               builder: (context, state) {
-                if(state is MainLoading) {
+                if(state.hasLoading) {
                   return const SizedBox(
                     width: double.infinity,
                       height: double.infinity,
                       child: Center(child: CircularProgressIndicator()));
                 }
-                else if(state is MainLoadTodoListSuccess) {
-                  final todos = state.todos;
-                  return  ListView.builder(
-                    itemCount: todos.length,
-                    itemBuilder: (context, index) {
 
-                      return  Column(
-                        children: [
-                          Row(
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(todos[index].title),
-                                  Text(todos[index].content),
+                return  ListView.builder(
+                  itemCount: state.todos.length,
+                  itemBuilder: (context, index) {
+                    final todos = state.todos;
+                    return  Column(
+                      children: [
+                        Row(
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(todos[index].title),
+                                Text(todos[index].content),
 
-                                ],
-                              ),
-                              const Spacer(),
-                              Checkbox(
-                                  value: todos[index].isDone,
-                                  onChanged: (value) {
-                                    mainCubit.changeTaskStatus(taskId: todos[index].id, newStatus: value ?? false);
-                                  }
-                              ),
-                              // delete
-                              IconButton(
-                                  onPressed: () {
-                                    BlocProvider.of<MainCubit>(context).deleteTask(taskId: todos[index].id);
-                                  },
-                                  icon: const Icon(
-                                    CupertinoIcons.delete_solid,
-                                    color: CupertinoColors.destructiveRed,
-                                  )),
-                              // edit
-                              IconButton(
-                                  onPressed: () {},
-                                  icon: const Icon(
-                                    CupertinoIcons.pencil,
-                                    color: CupertinoColors.activeBlue,
-                                  )),
-                            ],
-                          ),
-                          const Divider()
-                        ],
-                      );
-                    },
-                  );
-                } else if(state is MainLoadTodoListIsEmpty) {
-                  return const Center(child: Text("list is empty"));
-                } else {
-                  return Container();
-                }
+                              ],
+                            ),
+                            const Spacer(),
+                            Checkbox(
+                                value: todos[index].isDone,
+                                onChanged: (value) {
+                                  mainCubit.changeTaskStatus(taskId: todos[index].id, newStatus: value ?? false);
+                                }
+                            ),
+                            // delete
+                            IconButton(
+                                onPressed: () {
+                                  BlocProvider.of<MainCubit>(context).deleteTask(taskId: todos[index].id);
+                                },
+                                icon: const Icon(
+                                  CupertinoIcons.delete_solid,
+                                  color: CupertinoColors.destructiveRed,
+                                )),
+                            // edit
+                            IconButton(
+                                onPressed: () {},
+                                icon: const Icon(
+                                  CupertinoIcons.pencil,
+                                  color: CupertinoColors.activeBlue,
+                                )),
+                          ],
+                        ),
+                        const Divider()
+                      ],
+                    );
+                  },
+                );
               },
             ),
           )
